@@ -27,7 +27,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		categories = append(categories, uint(category))
 	}
 
-	jsonStr, err := getTorrents.RequestAll(query, categories)
+	jsonStr, err := getTorrents.RequestSimple(query, categories)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -40,3 +40,22 @@ func RequestAll(query string, categories []uint) (string, error) {
 
 	return string(jsonBytes), nil
 }
+
+func RequestSimple(query string, categories []uint) (string, error) {
+	ctx := context.Background()
+	j := GetJackettInstance()
+	resp, err := j.Fetch(ctx, &jackett.FetchRequest{
+		Categories: categories,
+		Query:      query,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	simpleRes, err := j.FilterResults(resp.Results)
+	if err != nil {
+		return "", err
+	}
+
+	return string(simpleRes), nil
+}

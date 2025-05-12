@@ -96,6 +96,15 @@ type Jackett struct {
 	settings *Settings
 }
 
+type SimpleResult struct {
+	Title     string `json:"title"`
+	Category  []uint `json:"category"`
+	MagnetUri string `json:"magnetUri"`
+	Link      string `json:"link"`
+	Tracker   string `json:"tracker"`
+	TrackerId string `json:"trackerId"`
+}
+
 func NewJackett(s *Settings) *Jackett {
 	if s.ApiURL == "" && apiURL != "" {
 		s.ApiURL = apiURL
@@ -154,6 +163,22 @@ func (j *Jackett) Fetch(ctx context.Context, fr *FetchRequest) (*FetchResponse, 
 		return nil, errors.Wrapf(err, "failed to unmarshal fetch data with url=%v and data=%v", u, string(data))
 	}
 	return &fres, nil
+}
+
+func (j *Jackett) FilterResults(results []Result) ([]byte, error) {
+	simpleResults := make([]SimpleResult, 0, len(results))
+	for _, r := range results {
+		sr := SimpleResult{
+			Title:     r.Title,
+			Category:  r.Category,
+			MagnetUri: r.MagnetUri,
+			Link:      r.Link,
+			Tracker:   r.Tracker,
+			TrackerId: r.TrackerId,
+		}
+		simpleResults = append(simpleResults, sr)
+	}
+	return json.Marshal(simpleResults)
 }
 
 func init() {
