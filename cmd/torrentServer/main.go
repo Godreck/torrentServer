@@ -25,6 +25,10 @@ func main() {
 	log.Info("initializing server", slog.String("address", cfg.Address)) // Помимо сообщения выведем параметр с адресом
 	log.Debug("logger debug mode enabled")
 
+	// router := chi.NewRouter()
+
+	// router.Use(middleware.Logger)
+
 	http.HandleFunc("/search", search.SearchHandler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Error(err.Error())
