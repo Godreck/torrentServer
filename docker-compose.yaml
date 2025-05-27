@@ -1,0 +1,44 @@
+# version: '3.8'
+
+services:
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=Europe/Moscow
+    volumes:
+      - ./jackett/config:/config
+      - ./jackett/downloads:/downloads
+    ports:
+      - "9117:9117"
+    restart: unless-stopped
+
+  redis-container:
+    image: redis:7-alpine
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  torrent-server:
+    build: .
+    volumes:
+      - ./internal/config/local.yaml:/app/internal/config/local.yaml:ro
+    container_name: torrent-server
+    depends_on:
+      - jackett
+      - redis-container
+    ports:
+      - "8080:8080"
+    environment:
+      - CONFIG_PATH=/app/internal/config/local.yaml
+      - REDIS_ADDR=redis-container:6379
+      - JACKETT_URL=http://jackett:9117
+    restart: unless-stopped
+
+volumes:
+  redis-data:
