@@ -15,8 +15,8 @@ var (
 func GetJackettInstance() *jackett.Jackett {
 	once.Do(func() {
 		jackettInstance = jackett.NewJackett(&jackett.Settings{
-			ApiURL: "http://localhost:9117",
-			ApiKey: "4k1y8yde4djn0kzzlcjlx47syqrlzzst",
+			ApiURL: "http://jackett:9117",              // http://localhost:9117
+			ApiKey: "4k1y8yde4djn0kzzlcjlx47syqrlzzst", //v7mi9deijytd3qzz359phbs1i2s31xwo
 		})
 	})
 	return jackettInstance
