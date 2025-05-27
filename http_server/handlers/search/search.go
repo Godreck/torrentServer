@@ -15,7 +15,7 @@ import (
 	getTorrents "torrentServer/internal/handlers/request"
 )
 
-var redisCache = cache.NewRedisCache("localhost:6379", 24*time.Hour)
+var redisCache = cache.NewRedisCache("redis-container:6379", 24*time.Hour)
 
 type PaginatedResponse struct {
 	Data       []map[string]interface{} `json:"data"` // Изменено на массив объектов
