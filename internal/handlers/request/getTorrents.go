@@ -18,22 +18,6 @@ var (
 	apiKey = os.Getenv("JACKETT_API_KEY")
 )
 
-// func init() {
-// 	if v, ok := os.LookupEnv("JACKETT_API_URL"); ok {
-// 		apiURL = v
-// 		log.Print("jackett api_url found status:", ok)
-// 	} else {
-// 		log.Print("jackett api_url NOT FOUND")
-// 	}
-// 	if v, ok := os.LookupEnv("JACKETT_API_KEY"); ok {
-// 		apiKey = v
-// 		log.Print("jackett api_key found status:", ok)
-// 	} else {
-// 		log.Print("jackett api_key NOT FOUND")
-
-// 	}
-// }
-
 func GetJackettInstance() *jackett.Jackett {
 	once.Do(func() {
 		jackettInstance = jackett.NewJackett(&jackett.Settings{
@@ -44,7 +28,7 @@ func GetJackettInstance() *jackett.Jackett {
 	return jackettInstance
 }
 
-func RequestAll(query string, categories []uint) (string, error) {
+func RequestAll(query string, categories []uint, safeOnly bool) (string, error) {
 	ctx := context.Background()
 	j := GetJackettInstance()
 	resp, err := j.Fetch(ctx, &jackett.FetchRequest{
@@ -63,7 +47,7 @@ func RequestAll(query string, categories []uint) (string, error) {
 	return string(jsonBytes), nil
 }
 
-func RequestSimple(query string, categories []uint) (string, error) {
+func RequestSimple(query string, categories []uint, safeOnly int) (string, error) {
 	ctx := context.Background()
 	j := GetJackettInstance()
 	resp, err := j.Fetch(ctx, &jackett.FetchRequest{
@@ -74,7 +58,7 @@ func RequestSimple(query string, categories []uint) (string, error) {
 		return "", err
 	}
 
-	simpleRes, err := j.FilterResults(resp.Results)
+	simpleRes, err := j.FilterResults(resp.Results, safeOnly)
 	if err != nil {
 		return "", err
 	}

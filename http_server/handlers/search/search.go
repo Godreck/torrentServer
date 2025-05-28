@@ -18,7 +18,7 @@ import (
 var redisCache = cache.NewRedisCache("redis-container:6379", 24*time.Hour)
 
 type PaginatedResponse struct {
-	Data       []map[string]interface{} `json:"data"` // Изменено на массив объектов
+	Data       []map[string]interface{} `json:"data"`
 	Page       int                      `json:"page"`
 	PerPage    int                      `json:"per_page"`
 	TotalItems int                      `json:"total_items"`
@@ -29,14 +29,14 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 
 	// Парсинг параметров
-	query, categories, err := parseRequestParams(r)
+	query, categories, safeOnly, err := parseRequestParams(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Получаем данные (из кэша или Jackett)
-	results, err := getOrFetchResults(ctx, query, categories)
+	results, err := getOrFetchResults(ctx, query, categories, safeOnly)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -61,28 +61,31 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 // Вспомогательные функции
 
-func parseRequestParams(r *http.Request) (string, []uint, error) {
+func parseRequestParams(r *http.Request) (string, []uint, int, error) {
 	query := r.URL.Query().Get("query")
 	categoriesStr := r.URL.Query().Get("categories")
-
+	safeOnly, err := strconv.Atoi(r.URL.Query().Get("safeOnly"))
+	if err != nil {
+		log.Printf("safeOnly param is required: %v", err)
+	}
 	if query == "" || categoriesStr == "" {
-		return "", nil, fmt.Errorf("query and categories parameters are required")
+		return "", nil, 0, fmt.Errorf("query and categories parameters are required")
 	}
 
 	categories := make([]uint, 0)
 	for _, c := range strings.Split(categoriesStr, ",") {
 		category, err := strconv.ParseUint(c, 10, 32)
 		if err != nil {
-			return "", nil, fmt.Errorf("invalid category format")
+			return "", nil, 0, fmt.Errorf("invalid category format")
 		}
 		categories = append(categories, uint(category))
 	}
 
-	return query, categories, nil
+	return query, categories, safeOnly, nil
 }
 
-func getOrFetchResults(ctx context.Context, query string, categories []uint) ([]map[string]interface{}, error) {
-	cacheKey := generateCacheKey(query, categories)
+func getOrFetchResults(ctx context.Context, query string, categories []uint, safeOnly int) ([]map[string]interface{}, error) {
+	cacheKey := generateCacheKey(query, categories, safeOnly)
 
 	// Пытаемся получить из кэша
 	var results []map[string]interface{}
@@ -91,7 +94,7 @@ func getOrFetchResults(ctx context.Context, query string, categories []uint) ([]
 	}
 
 	// Запрос к Jackett
-	jsonStr, err := getTorrents.RequestSimple(query, categories)
+	jsonStr, err := getTorrents.RequestSimple(query, categories, safeOnly)
 	if err != nil {
 		return nil, err
 	}
@@ -137,9 +140,9 @@ func applyPagination(data []map[string]interface{}, page, perPage int) ([]map[st
 	return data[start:end], totalPages
 }
 
-func generateCacheKey(query string, categories []uint) string {
+func generateCacheKey(query string, categories []uint, safeOnly int) string {
 	sort.Slice(categories, func(i, j int) bool { return categories[i] < categories[j] })
-	return fmt.Sprintf("query=%s&categories=%v", query, categories)
+	return fmt.Sprintf("query=%s&categories=%v&safeOnly=%d", query, categories, safeOnly)
 }
 
 func parsePaginationParams(r *http.Request) (int, int) {

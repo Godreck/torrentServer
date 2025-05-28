@@ -165,9 +165,12 @@ func (j *Jackett) Fetch(ctx context.Context, fr *FetchRequest) (*FetchResponse, 
 	return &fres, nil
 }
 
-func (j *Jackett) FilterResults(results []Result) ([]byte, error) {
+func (j *Jackett) FilterResults(results []Result, safeOnly int) ([]byte, error) {
 	simpleResults := make([]SimpleResult, 0, len(results))
 	for _, r := range results {
+		if safeOnly == 1 && r.Tracker != "Internet Archive" {
+			continue
+		}
 		sr := SimpleResult{
 			Title:     r.Title,
 			Category:  r.Category,
@@ -186,9 +189,6 @@ func (j *Jackett) FilterResults(results []Result) ([]byte, error) {
 }
 
 func init() {
-	// if err := godotenv.Load(); err != nil {
-	// 	log.Print("No .env file found")
-	// }
 	if v, ok := os.LookupEnv("JACKETT_API_URL"); ok {
 		apiURL = v
 	}
