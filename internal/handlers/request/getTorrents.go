@@ -3,8 +3,9 @@ package getTorrents
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"sync"
-	"torrentServer/internal/services/jackett"
+	jackett "torrentServer/internal/services/jackett"
 )
 
 var (
@@ -12,11 +13,32 @@ var (
 	once            sync.Once
 )
 
+var (
+	apiURL = os.Getenv("JACKETT_API_URL")
+	apiKey = os.Getenv("JACKETT_API_KEY")
+)
+
+// func init() {
+// 	if v, ok := os.LookupEnv("JACKETT_API_URL"); ok {
+// 		apiURL = v
+// 		log.Print("jackett api_url found status:", ok)
+// 	} else {
+// 		log.Print("jackett api_url NOT FOUND")
+// 	}
+// 	if v, ok := os.LookupEnv("JACKETT_API_KEY"); ok {
+// 		apiKey = v
+// 		log.Print("jackett api_key found status:", ok)
+// 	} else {
+// 		log.Print("jackett api_key NOT FOUND")
+
+// 	}
+// }
+
 func GetJackettInstance() *jackett.Jackett {
 	once.Do(func() {
 		jackettInstance = jackett.NewJackett(&jackett.Settings{
-			ApiURL: "http://jackett:9117",              // http://localhost:9117
-			ApiKey: "4k1y8yde4djn0kzzlcjlx47syqrlzzst", //v7mi9deijytd3qzz359phbs1i2s31xwo
+			ApiURL: apiURL,
+			ApiKey: apiKey,
 		})
 	})
 	return jackettInstance

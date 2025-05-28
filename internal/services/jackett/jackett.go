@@ -100,9 +100,9 @@ type SimpleResult struct {
 	Title     string `json:"title"`
 	Category  []uint `json:"category"`
 	MagnetUri string `json:"magnetUri"`
-	Link      string `json:"link"`
-	Tracker   string `json:"tracker"`
-	TrackerId string `json:"trackerId"`
+	// Link      string `json:"link"`
+	// Tracker   string `json:"tracker"`
+	// TrackerId string `json:"trackerId"`
 }
 
 func NewJackett(s *Settings) *Jackett {
@@ -172,16 +172,23 @@ func (j *Jackett) FilterResults(results []Result) ([]byte, error) {
 			Title:     r.Title,
 			Category:  r.Category,
 			MagnetUri: r.MagnetUri,
-			Link:      r.Link,
-			Tracker:   r.Tracker,
-			TrackerId: r.TrackerId,
+			// Link:      r.Link,
+			// Tracker:   r.Tracker,
+			// TrackerId: r.TrackerId,
+		}
+		if r.MagnetUri == "" {
+			continue
 		}
 		simpleResults = append(simpleResults, sr)
+
 	}
 	return json.Marshal(simpleResults)
 }
 
 func init() {
+	// if err := godotenv.Load(); err != nil {
+	// 	log.Print("No .env file found")
+	// }
 	if v, ok := os.LookupEnv("JACKETT_API_URL"); ok {
 		apiURL = v
 	}
