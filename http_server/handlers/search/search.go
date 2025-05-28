@@ -137,7 +137,6 @@ func applyPagination(data []map[string]interface{}, page, perPage int) ([]map[st
 	return data[start:end], totalPages
 }
 
-// Остальные функции остаются без изменений
 func generateCacheKey(query string, categories []uint) string {
 	sort.Slice(categories, func(i, j int) bool { return categories[i] < categories[j] })
 	return fmt.Sprintf("query=%s&categories=%v", query, categories)
