@@ -1,4 +1,7 @@
 .env
 legacy/
 hardcode/
-jackett/
+jackett/сonfig/Jackett/DataProtection
+jackett/config/Jackett/log.txt
+jackett/config/Jackett/ServerConfig.json
+jackett/config/Jackett/downloads
