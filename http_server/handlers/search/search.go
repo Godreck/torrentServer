@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -15,7 +16,10 @@ import (
 	getTorrents "torrentServer/internal/handlers/request"
 )
 
-var redisCache = cache.NewRedisCache("redis-container:6379", 24*time.Hour)
+var (
+	cacheTTL   time.Duration = 3600
+	redisCache               = cache.NewRedisCache(os.Getenv("REDIS_ADDR"), cacheTTL)
+)
 
 type PaginatedResponse struct {
 	Data       []map[string]interface{} `json:"data"`
@@ -158,3 +162,7 @@ func parsePaginationParams(r *http.Request) (int, int) {
 
 	return page, perPage
 }
+
+// func init() {
+// 	// cacheTTL, _ = time.ParseDuration(os.("CACHE_TTL"))
+// }
