@@ -9,7 +9,6 @@ import (
 	"torrentServer/internal/services/jackett"
 )
 
-// В пакете jackett (или в getTorrents, если не хотите менять jackett)
 type JackettClient interface {
 	Fetch(ctx context.Context, req *jackett.FetchRequest) (*jackett.FetchResponse, error)
 	FilterResults(results []jackett.Result) ([]byte, error)

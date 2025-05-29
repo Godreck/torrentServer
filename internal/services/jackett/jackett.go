@@ -100,9 +100,6 @@ type SimpleResult struct {
 	Title     string `json:"title"`
 	Category  []uint `json:"category"`
 	MagnetUri string `json:"magnetUri"`
-	// Link      string `json:"link"`
-	// Tracker   string `json:"tracker"`
-	// TrackerId string `json:"trackerId"`
 }
 
 func NewJackett(s *Settings) *Jackett {
