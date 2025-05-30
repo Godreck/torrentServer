@@ -97,9 +97,14 @@ type Jackett struct {
 }
 
 type SimpleResult struct {
-	Title     string `json:"title"`
-	Category  []uint `json:"category"`
-	MagnetUri string `json:"magnetUri"`
+	Title       string `json:"title"`
+	Category    []uint `json:"category"`
+	MagnetUri   string `json:"magnetUri"`
+	Seeders     uint   `json: "seeders`
+	Size        uint   `json: "size"`
+	Peers       uint   `json: "peers"`
+	Description string `json: "description"`
+	Tracker     string `json: "Tracker"`
 }
 
 func NewJackett(s *Settings) *Jackett {
@@ -173,8 +178,12 @@ func (j *Jackett) FilterResults(results []Result, safeOnly int) ([]byte, error) 
 			Category:  r.Category,
 			MagnetUri: r.MagnetUri,
 			// Link:      r.Link,
-			// Tracker:   r.Tracker,
+			Tracker: r.Tracker,
 			// TrackerId: r.TrackerId,
+			Seeders:     r.Seeders,
+			Size:        r.Size,
+			Peers:       r.Peers,
+			Description: r.Description,
 		}
 		if r.MagnetUri == "" {
 			continue

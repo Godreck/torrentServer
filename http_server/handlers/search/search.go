@@ -162,7 +162,3 @@ func parsePaginationParams(r *http.Request) (int, int) {
 
 	return page, perPage
 }
-
-// func init() {
-// 	// cacheTTL, _ = time.ParseDuration(os.("CACHE_TTL"))
-// }
