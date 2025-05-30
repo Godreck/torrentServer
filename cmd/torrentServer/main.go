@@ -15,24 +15,9 @@ const (
 	envProd  = "prod"
 )
 
-// func init() {
-// 	// loads values from .env into the system
-// 	if err := godotenv.Load(); err != nil {
-// 		log.Print("No .env file found")
-// 	}
-// }
-
 func main() {
 	// загружаем конфиг
 	cfg := config.MustLoad()
-
-	// if err := godotenv.Load("../../.env"); err != nil {
-	// 	log.Printf("Error loading .env file: %v", err)
-	// }
-
-	// Теперь можно безопасно читать переменные окружения
-	// apiURL := os.Getenv("JACKETT_API_URL")
-	// apiKey := os.Getenv("JACKETT_API_KEY")
 
 	log := setupLogger(cfg.Env)
 	log = log.With(slog.String("env", cfg.Env)) // к каждому сообщению будет добавляться поле с информацией о текущем окружении
